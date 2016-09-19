@@ -1,0 +1,24 @@
+{
+  "name": "youtube-to-slack",
+  "version": "1.0.0",
+  "description": "Node.JS script sending slack message when selected youtube channel/user upload new video.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BernardJeremy/youtube-to-slack.git"
+  },
+  "author": "BernardJeremy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BernardJeremy/youtube-to-slack/issues"
+  },
+  "homepage": "https://github.com/BernardJeremy/youtube-to-slack#readme",
+  "dependencies": {
+    "cheerio": "^0.22.0",
+    "request": "^2.69.0",
+    "slack-node": "^0.2.0"
+  }
+}

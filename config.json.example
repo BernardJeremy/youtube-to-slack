@@ -1,0 +1,9 @@
+{
+  "youtubeBaseLink": "https://www.youtube.com",
+  "channelID": {
+    "user" : [],
+    "channel": []
+  },
+  "slackHookUrl" : "https://hooks.slack.com/services/....",
+  "slackHookName" : "youtube-to-slack"
+}
