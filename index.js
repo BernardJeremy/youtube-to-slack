@@ -37,7 +37,7 @@ function sendSlackMessage(targetChannel, displayedName, videoElement) {
   let link = youtubeBaseLink + videoElement.find(".yt-uix-tile-link").attr('href');
 
   let text = '*' + displayedName + '*' + ' released a new video : ';
-  text += title + ' (' + duration + ')' + '\n';
+  text += '*' + title + '*' + ' (' + duration + ')' + '\n';
   text += '<' + link + '>';
 
   let msgParameters = {
@@ -45,7 +45,7 @@ function sendSlackMessage(targetChannel, displayedName, videoElement) {
     icon_emoji: 'https://www.youtube.com/yt/brand/media/image/YouTube-icon-full_color.png',
     text: text,
   };
-  
+
   let slack = new Slack();
   slack.setWebhook(slackUrl);
   slack.webhook(msgParameters, function (err, response) {
@@ -82,9 +82,7 @@ function performOnlineCheck(prefix, targetChannel, suffix) {
     for (let i = retrievedIdLength - 1; i >= 0; --i) {
         if (retrievedId[i] == savedData.lastRecordedId) {
           lastRecordedIdIndex = i;
-          console.log("LAST RECORDED:", retrievedId[i]);
         } else if (i < lastRecordedIdIndex) {
-          console.log("NEW ID:", retrievedId[i]);
           sendSlackMessage(targetChannel, displayedName, retrievedVideo[retrievedId[i]]);
         }
     }
