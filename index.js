@@ -20,10 +20,14 @@ function getSaveFilename(targetChannel) {
   return 'last_video_' + targetChannel + '.json'
 }
 
+function getVideoObjLink(videoElement) {
+  return youtubeBaseLink + videoElement.find(".yt-uix-tile-link").attr('href');
+}
+
 // Perform update of the last video ID file
-function updateSavedData(targetChannel, lastRecordedId) {
+function updateSavedData(targetChannel, lastVideoUrl) {
   let newData = {};
-  newData.lastRecordedId = lastRecordedId;
+  newData.lastVideoUrl = lastVideoUrl;
   if (fs.existsSync(getSaveFilename(targetChannel))) {
     fs.unlinkSync(getSaveFilename(targetChannel));
   }
@@ -34,7 +38,7 @@ function updateSavedData(targetChannel, lastRecordedId) {
 function sendSlackMessage(targetChannel, displayedName, videoElement) {
   let title = videoElement.find(".yt-uix-tile-link").text();
   let duration = videoElement.find(".video-time").text();
-  let link = youtubeBaseLink + videoElement.find(".yt-uix-tile-link").attr('href');
+  let link = getVideoObjLink(videoElement);
 
   let text = '*' + displayedName + '*' + ' released a new video : ';
   text += '*' + title + '*' + ' (' + duration + ')' + '\n';
@@ -74,21 +78,22 @@ function performOnlineCheck(prefix, targetChannel, suffix) {
     if (fs.existsSync(getSaveFilename(targetChannel))) {
       savedData = JSON.parse(fs.readFileSync(getSaveFilename(targetChannel), 'utf8'))
     } else {
-      return updateSavedData(targetChannel, retrievedId[0]); // first time, set last recorded ID to last video ID
+      return updateSavedData(targetChannel, getVideoObjLink(retrievedVideo[retrievedId[0]])); // first time, set last recorded ID to last video ID
     }
 
     let retrievedIdLength = retrievedId.length;
     let lastRecordedIdIndex = 0; // by default, the last recorded id is the 'most recent' video
     for (let i = retrievedIdLength - 1; i >= 0; --i) {
-        if (retrievedId[i] == savedData.lastRecordedId) {
+        if (getVideoObjLink(retrievedVideo[retrievedId[i]]) === savedData.lastVideoUrl) {
           lastRecordedIdIndex = i;
         } else if (i < lastRecordedIdIndex) {
           sendSlackMessage(targetChannel, displayedName, retrievedVideo[retrievedId[i]]);
         }
     }
 
-    if (savedData.lastRecordedId != retrievedId[0]) { // If more recent video detected
-      updateSavedData(targetChannel, retrievedId[0])
+
+    if (savedData.lastVideoUrl !== getVideoObjLink(retrievedVideo[retrievedId[0]])) { // If more recent video detected
+      updateSavedData(targetChannel, getVideoObjLink(retrievedVideo[retrievedId[0]]))
     }
   });
 }
@@ -98,7 +103,7 @@ if (isArray(channelID.user)) {
   channelID.user.forEach(function(username){
     performOnlineCheck('/user/',  username, '/videos');
   });
-} else {
+} else if (channelID.user) {
   performOnlineCheck('/user/', channelID.user, '/videos');
 }
 
@@ -107,6 +112,6 @@ if (isArray(channelID.channel)) {
   channelID.channel.forEach(function(id){
     performOnlineCheck('/channel/', id, '/videos');
   });
-} else {
+} else if (channelID.channel) {
   performOnlineCheck('/channel/', channelID.channel, '/videos');
 }
